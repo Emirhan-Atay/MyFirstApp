@@ -235,10 +235,6 @@ export default function CategoryDetailScreen() {
               </>
             ) : (
               <>
-                <View style={styles.detailItem}>
-                  <Text style={styles.label}>Category ID:</Text>
-                  <Text style={styles.value}>{category.CategoryID}</Text>
-                </View>
 
                 <View style={styles.detailItem}>
                   <Text style={styles.label}>Category Name:</Text>

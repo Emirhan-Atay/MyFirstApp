@@ -5,13 +5,15 @@ import {
   TextInput, 
   TouchableOpacity, 
   StyleSheet, 
-  Alert 
+  Alert,
+  Image,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../types';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import api from '../api/axiosInstance';
+import ScreenWrapper from '../components/ScreenWrapper';
 
 type LoginNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Login'>;
 
@@ -57,26 +59,35 @@ export default function LoginScreen() {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Login</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Username"
-        value={username}
-        onChangeText={setUsername}
-        autoCapitalize="none"
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Password"
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-      />
-      <TouchableOpacity style={styles.button} onPress={handleLogin}>
-        <Text style={styles.buttonText}>Login</Text>
-      </TouchableOpacity>
-    </View>
+    <ScreenWrapper>
+      <View>
+        <Image 
+          source={require('../../assets/worksoft-logo-01-1.png')} 
+          style={styles.logo}
+        />
+      </View>
+      <View style={styles.container}>
+        <Text style={styles.title}>Login</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Username"
+          value={username}
+          onChangeText={setUsername}
+          autoCapitalize="none"
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Password"
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry
+        />
+        <TouchableOpacity style={styles.button} onPress={handleLogin}>
+          <Text style={styles.buttonText}>Login</Text>
+        </TouchableOpacity>
+      </View>
+    </ScreenWrapper>
+
   );
 }
 
@@ -106,10 +117,17 @@ const styles = StyleSheet.create({
     backgroundColor: '#007BFF',
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: 5,
+    borderRadius: 25,
   },
   buttonText: {
     color: '#fff',
     fontSize: 18,
+  },
+  logo: {
+    position: 'absolute',
+    width: 230,
+    height: 230,
+    alignSelf: 'center',
+    top: 50,
   },
 });

@@ -3,7 +3,6 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import LoginScreen from '../screens/LoginScreen';
 import HomeScreen from '../screens/HomeScreen';
-import ProductListScreen from '../screens/ProductListScreen';
 import AddProductScreen from '../screens/AddProductScreen';
 import CategoryListScreen from '../screens/CategoryListScreen';
 import AddCategoryScreen from '../screens/AddCategoryScreen';
@@ -22,7 +21,6 @@ export default function AppNavigator() {
       >
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="Home" component={HomeScreen} />
-        <Stack.Screen name="ProductList" component={ProductListScreen} />
         <Stack.Screen name="AddProduct" component={AddProductScreen} />
         <Stack.Screen name="CategoryList" component={CategoryListScreen} />
         <Stack.Screen name="AddCategory" component={AddCategoryScreen} />

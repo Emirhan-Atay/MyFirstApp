@@ -227,10 +227,6 @@ export default function ProductDetailScreen() {
             </>
           ) : (
             <>
-              <View style={styles.detailItem}>
-                <Text style={styles.label}>Product ID:</Text>
-                <Text style={styles.value}>{product.ProductID}</Text>
-              </View>
 
               <View style={styles.detailItem}>
                 <Text style={styles.label}>Product Name:</Text>
