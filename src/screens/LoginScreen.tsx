@@ -41,7 +41,7 @@ export default function LoginScreen() {
         await AsyncStorage.setItem('token', response.data.token);
         navigation.reset({
           index: 0,
-          routes: [{ name: 'Home' }], // 'Main' yerine 'Home' olmalı
+          routes: [{ name: 'Home' }],
         });
       } else {
         Alert.alert('Login Failed', 'Invalid credentials');
@@ -85,6 +85,15 @@ export default function LoginScreen() {
         <TouchableOpacity style={styles.button} onPress={handleLogin}>
           <Text style={styles.buttonText}>Login</Text>
         </TouchableOpacity>
+        
+        <TouchableOpacity 
+          style={styles.linkButton} 
+          onPress={() => navigation.navigate('Register')}
+        >
+          <Text style={styles.linkText}>
+            Don't have an account? Register
+          </Text>
+        </TouchableOpacity>
       </View>
     </ScreenWrapper>
 
@@ -101,6 +110,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     marginBottom: 20,
+    fontWeight: 'bold',
   },
   input: {
     width: '100%',
@@ -129,5 +139,12 @@ const styles = StyleSheet.create({
     height: 230,
     alignSelf: 'center',
     top: 50,
+  },
+  linkButton: {
+    marginTop: 15,
+  },
+  linkText: {
+    color: '#007BFF',
+    fontSize: 16,
   },
 });

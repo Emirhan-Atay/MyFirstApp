@@ -23,7 +23,7 @@ type HomeScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'H
 type Product = {
   ProductID: number;
   ProductName: string;
-  ProductIcon?: string;
+  ProductPrice?: number;
   CategoryName: string;
   CategoryID: number;
 };
@@ -48,7 +48,7 @@ export default function HomeScreen() {
       const mappedProducts = response.data.map((item: any) => ({
         ProductID: item.productID,
         ProductName: item.productName,
-        ProductIcon: item.productIcon,
+        ProductPrice: item.productPrice,
         CategoryName: item.categoryName,
         CategoryID: item.categoryID,
       }));
@@ -125,14 +125,14 @@ export default function HomeScreen() {
                 <View style={styles.categoryInfo}>
                   <Text style={styles.categoryName}>Category: {item.CategoryName}</Text>
                 </View>
-                {item.ProductIcon ? (
+                {item.ProductPrice ? (
                   <View style={styles.iconRow}>
                     <IconComponent iconName="emoji-emotions" size={16} color="#888" />
-                    <Text style={styles.productIcon}>{item.ProductIcon}</Text>
+                    <Text style={styles.productPrice}>{item.ProductPrice}</Text>
                   </View>
                 ) : (
                   <View style={styles.iconRow}>
-                    <Text style={styles.productIcon}>No Icon</Text>
+                    <Text style={styles.productPrice}>No Price</Text>
                   </View>
                 )}
               </View>
@@ -285,7 +285,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-  productIcon: { 
+  productPrice: { 
     fontSize: 14, 
     color: '#888', 
     marginLeft: 8,

@@ -24,7 +24,7 @@ type ProductDetailRouteProp = RouteProp<RootStackParamList, 'ProductDetail'>;
 type Product = {
   ProductID: number;
   ProductName: string;
-  ProductIcon?: string;
+  ProductPrice?: number;
   CategoryName: string;
   CategoryID: number;
 };
@@ -72,7 +72,7 @@ export default function ProductDetailScreen() {
       const productData = {
         ProductID: response.data.productID,
         ProductName: response.data.productName,
-        ProductIcon: response.data.productIcon,
+        ProductPrice: response.data.productPrice,
         CategoryName: categoryName || 'Unknown Category',
         CategoryID: categoryID || 0,
       };
@@ -99,25 +99,57 @@ export default function ProductDetailScreen() {
   const handleSave = async () => {
     if (!editedProduct) return;
 
+    if (!editedProduct.ProductName.trim()) {
+      Alert.alert('Error', 'Product name cannot be empty');
+      return;
+    }
+
+    if ((editedProduct.ProductPrice || 0) < 0) {
+      Alert.alert('Error', 'Product price cannot be negative');
+      return;
+    }
+
     try {
       const token = await AsyncStorage.getItem('token');
       if (token) {
         api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
       }
 
+      // Debug: API'ye gönderilen veriyi görelim
       const updateData = {
-        productName: editedProduct.ProductName,
-        productIcon: editedProduct.ProductIcon,
-        categoryID: editedProduct.CategoryID,
+         ProductName: editedProduct.ProductName,    // Büyük P ile
+        ProductPrice: editedProduct.ProductPrice || 0,
+        CategoryID: editedProduct.CategoryID,
       };
 
-      await api.put(`/Products/${productId}`, updateData);
+      console.log('Sending update data:', updateData);
+      console.log('API endpoint:', `/Products/${productId}`);
+
+      const response = await api.put(`/Products/${productId}`, updateData);
+      
+      console.log('Update response:', response.data);
+      console.log('Update status:', response.status);
+
       setProduct(editedProduct);
       setEditing(false);
       Alert.alert('Success', 'Product updated successfully');
-    } catch (error) {
-      console.log('Error updating product:', error);
-      Alert.alert('Error', 'Failed to update product');
+    } catch (error: any) {
+      console.log('Full update error:', error);
+      console.log('Error response:', error.response);
+      console.log('Error status:', error.response?.status);
+      console.log('Error data:', error.response?.data);
+      
+      // Daha detaylı hata mesajı
+      let errorMessage = 'Failed to update product';
+      if (error.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      } else if (error.response?.data) {
+        errorMessage = error.response.data;
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
+      Alert.alert('Error', errorMessage);
     }
   };
 
@@ -203,24 +235,31 @@ export default function ProductDetailScreen() {
               </View>
 
               <View style={styles.inputGroup}>
-                <Text style={styles.label}>Product Icon:</Text>
+                <Text style={styles.label}>Product Price:</Text>
                 <TextInput
                   style={styles.input}
-                  value={editedProduct?.ProductIcon || ''}
-                  onChangeText={(text) =>
-                    setEditedProduct(prev => prev ? { ...prev, ProductIcon: text } : null)
-                  }
-                  placeholder="Enter product icon"
+                  value={editedProduct?.ProductPrice?.toString() || ''}
+                  onChangeText={(text) => {
+                    if (text === '') {
+                      setEditedProduct(prev => prev ? { ...prev, ProductPrice: 0 } : null);
+                      return;
+                    }
+                    
+                    const numericValue = parseFloat(text);
+                    if (!isNaN(numericValue)) {
+                      setEditedProduct(prev => prev ? { ...prev, ProductPrice: numericValue } : null);
+                    }
+                  }}
+                  placeholder="Enter product price"
+                  keyboardType="decimal-pad"
                 />
               </View>
 
               <View style={styles.buttonRow}>
                 <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-                  <Icon name="save" size={16} color="#fff" style={styles.buttonIcon} />
                   <Text style={styles.buttonText}>Save</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.cancelButton} onPress={handleCancel}>
-                  <Icon name="cancel" size={16} color="#fff" style={styles.buttonIcon} />
                   <Text style={styles.buttonText}>Cancel</Text>
                 </TouchableOpacity>
               </View>
@@ -239,8 +278,8 @@ export default function ProductDetailScreen() {
               </View>
 
               <View style={styles.detailItem}>
-                <Text style={styles.label}>Product Icon:</Text>
-                <Text style={styles.value}>{product.ProductIcon || 'No Icon'}</Text>
+                <Text style={styles.label}>Product Price:</Text>
+                <Text style={styles.value}>{product.ProductPrice || 'No Price'}</Text>
               </View>
 
               <View style={styles.buttonRow}>

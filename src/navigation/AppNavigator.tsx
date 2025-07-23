@@ -8,6 +8,7 @@ import CategoryListScreen from '../screens/CategoryListScreen';
 import AddCategoryScreen from '../screens/AddCategoryScreen';
 import ProductDetailScreen from '../screens/ProductDetailScreen';
 import CategoryDetailScreen from '../screens/CategoryDetailScreen';
+import RegisterScreen from '../screens/RegisterScreen';
 import { RootStackParamList } from '../types';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -26,6 +27,7 @@ export default function AppNavigator() {
         <Stack.Screen name="AddCategory" component={AddCategoryScreen} />
         <Stack.Screen name="ProductDetail" component={ProductDetailScreen} />
         <Stack.Screen name="CategoryDetail" component={CategoryDetailScreen} />
+        <Stack.Screen name="Register" component={RegisterScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

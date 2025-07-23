@@ -5,7 +5,8 @@ import {
   TextInput, 
   Button, 
   StyleSheet, 
-  Alert 
+  Alert,
+  Image, 
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import api from '../api/axiosInstance';
@@ -15,11 +16,11 @@ import axios from 'axios';
 export default function AddProductScreen() {
   const [productName, setProductName] = useState('');
   const [categoryName, setCategoryName] = useState('');
-  const [productIcon, setProductIcon] = useState('');
+  const [productPrice, setProductPrice] = useState('');
   const navigation = useNavigation();
 
   const handleAdd = async () => {
-    if (!productName || !categoryName) {
+    if (!productName || !categoryName || !productPrice) {
       Alert.alert('Error', 'Please fill in all fields.');
       return;
     }
@@ -34,13 +35,13 @@ export default function AddProductScreen() {
 
       await api.post('/Products', {
         productName,
-        productIcon,
+        productPrice,
         categoryID,
       });
 
       Alert.alert('Product added successfully.');
       setProductName('');
-      setProductIcon('');
+      setProductPrice('');
       setCategoryName('');
       navigation.goBack();
 
@@ -72,9 +73,9 @@ export default function AddProductScreen() {
       />
       <TextInput
         style={styles.input}
-        placeholder="Product Icon"
-        value={productIcon}
-        onChangeText={setProductIcon}
+        placeholder="Product Price"
+        value={productPrice}
+        onChangeText={setProductPrice}
         multiline={false}
         maxLength={10}
         autoCorrect={false}
@@ -105,5 +106,28 @@ const styles = StyleSheet.create({
     padding: 10,
     marginBottom: 15,
     fontSize: 16,
+  },
+  logo: {
+    position: 'absolute',
+    top: 20,
+    left: 10,
+    width: 70,
+    height: 70,
+  },
+  AddButton: {
+    backgroundColor: '#007BFF',
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 25,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
 });
