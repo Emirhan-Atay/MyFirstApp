@@ -39,7 +39,6 @@ export default function RegisterScreen() {
     }
 
     try {
-      console.log('Sending data:', { username, password }); // Debug
       
       const response = await api.post('/Users', {
         UserName: username,
@@ -48,7 +47,6 @@ export default function RegisterScreen() {
         UserPassword: password,
       });
 
-      console.log('Response:', response); // Debug
       
       if (response.status === 200 || response.status === 201) {
         Alert.alert('Success', 'Account created successfully!', [
@@ -56,10 +54,10 @@ export default function RegisterScreen() {
         ]);
       }
     } catch (error: any) {
-      console.log('Full error:', error); // Tam hatayı görmek için
-      console.log('Error response:', error.response); // API'nin döndüğü hata
-      console.log('Error status:', error.response?.status); // Status code
-      console.log('Error data:', error.response?.data); // Hata mesajı
+      console.log('Full error:', error);
+      console.log('Error response:', error.response); 
+      console.log('Error status:', error.response?.status);
+      console.log('Error data:', error.response?.data);
       
       if (error.response && error.response.status === 400) {
         Alert.alert('Registration Failed', error.response?.data?.message || 'Username already exists');

@@ -9,6 +9,7 @@ import {
   Alert,
   ScrollView,
   FlatList,
+  Image
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import api from '../api/axiosInstance';
@@ -177,7 +178,7 @@ export default function CategoryDetailScreen() {
         <View style={styles.centered}>
           <Text>Category not found</Text>
           <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-            <Text style={styles.backButtonText}>Go Back</Text>
+            <Icon name="arrow-back" size={20} color="#fff" />
           </TouchableOpacity>
         </View>
       </ScreenWrapper>
@@ -187,10 +188,13 @@ export default function CategoryDetailScreen() {
   return (
     <ScreenWrapper>
       <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-          <Text style={styles.backButtonText}>Back</Text>
-        </TouchableOpacity>
+        <View style={styles.logoSpace}>
+          <Image source={require('../../assets/worksoft-logomark-01-1.png')} style={styles.logo} />
+        </View>
         <Text style={styles.titleText}>Category Details</Text>
+        <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+          <Icon name="arrow-back" size={20} color="#fff" />
+        </TouchableOpacity>
       </View>
 
       <ScrollView style={styles.container}>
@@ -298,32 +302,47 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingTop: 30,
-    paddingBottom: 10,
-    paddingHorizontal: 15,
-    backgroundColor: '#f0f0f005',
+    justifyContent: 'space-between',
+    paddingTop: 50,
+    paddingBottom: 15,
+    paddingHorizontal: 20,
+    backgroundColor: '#fff',
+    borderBottomWidth: 1,
+    borderBottomColor: '#e0e0e0',
   },
-  backButton: {
-    backgroundColor: '#6c757d',
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderRadius: 5,
-    marginRight: 15,
-    flexDirection: 'row',
-    alignItems: 'center',
+  logoSpace: {
+    width: 35,
+    height: 40,
   },
-  backButtonText: {
-    color: '#fff',
-    fontWeight: 'bold',
-    fontSize: 14,
-    marginLeft: 4,
+  logo: {
+    position: 'absolute',
+    top: -15,
+    left: -15,
+    width: 70,
+    height: 70,
   },
   titleText: {
     fontSize: 24,
     fontWeight: 'bold',
+    color: '#333',
     flex: 1,
     textAlign: 'center',
-    marginRight: 60,
+  },
+  backButton: {
+    backgroundColor: '#dc3545',
+    width: 60,
+    height: 40,
+    borderRadius: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
   container: {
     flex: 1,
@@ -438,17 +457,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#666',
     marginTop: 2,
-  },
-  productDetailButton: {
-    backgroundColor: '#17a2b8',
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    borderRadius: 5,
-  },
-  productDetailButtonText: {
-    color: '#fff',
-    fontSize: 12,
-    fontWeight: 'bold',
   },
   emptyState: {
     padding: 20,

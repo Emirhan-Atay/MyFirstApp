@@ -8,6 +8,7 @@ import {
   TextInput,
   Alert,
   ScrollView,
+  Image
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import api from '../api/axiosInstance';
@@ -115,11 +116,11 @@ export default function ProductDetailScreen() {
         api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
       }
 
-      // Debug: API'ye gönderilen veriyi görelim
       const updateData = {
-         ProductName: editedProduct.ProductName,    // Büyük P ile
-        ProductPrice: editedProduct.ProductPrice || 0,
-        CategoryID: editedProduct.CategoryID,
+        productID: productId,
+        productName: editedProduct.ProductName,
+        productPrice: editedProduct.ProductPrice || 0,
+        categoryID: editedProduct.CategoryID,
       };
 
       console.log('Sending update data:', updateData);
@@ -144,7 +145,7 @@ export default function ProductDetailScreen() {
       if (error.response?.data?.message) {
         errorMessage = error.response.data.message;
       } else if (error.response?.data) {
-        errorMessage = error.response.data;
+        errorMessage = JSON.stringify(error.response.data);
       } else if (error.message) {
         errorMessage = error.message;
       }
@@ -201,8 +202,8 @@ export default function ProductDetailScreen() {
       <ScreenWrapper>
         <View style={styles.centered}>
           <Text>Product not found</Text>
-          <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-            <Text style={styles.backButtonText}>Go Back</Text>
+          <TouchableOpacity style={styles.homeButton} onPress={() => navigation.goBack()}>
+            <Text style={styles.homeButtonText}>Go Back</Text>
           </TouchableOpacity>
         </View>
       </ScreenWrapper>
@@ -212,10 +213,13 @@ export default function ProductDetailScreen() {
   return (
     <ScreenWrapper> 
       <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-          <Text style={styles.backButtonText}>←</Text>
-        </TouchableOpacity>
+        <View style={styles.logoSpace}>
+          <Image source={require('../../assets/worksoft-logomark-01-1.png')} style={styles.logo} />
+        </View>
         <Text style={styles.titleText}>Product Details</Text>
+        <TouchableOpacity style={styles.homeButton} onPress={() => navigation.navigate('Home')}>
+          <Icon name="home" size={20} color="#fff" />
+        </TouchableOpacity>
       </View>
 
       <ScrollView style={styles.container}>
@@ -302,21 +306,42 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingTop: 30,
-    paddingBottom: 10,
-    paddingHorizontal: 15,
-    backgroundColor: '#f0f0f005',
+    justifyContent: 'space-between',
+    paddingTop: 50,
+    paddingBottom: 15,
+    paddingHorizontal: 20,
+    backgroundColor: '#fff',
+    borderBottomWidth: 1,
+    borderBottomColor: '#e0e0e0',
   },
-  backButton: {
-    backgroundColor: '#6c757d',
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderRadius: 5,
-    marginRight: 15,
-    flexDirection: 'row',
+  logoSpace: {
+    width: 50,
+    height: 40,
+  },
+  titleText: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#333',
+    flex: 1,
+    textAlign: 'center',
+  },
+  homeButton: {
+    backgroundColor: '#dc3545',
+    width: 60,
+    height: 40,
+    borderRadius: 20,
+    justifyContent: 'center',
     alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
-  backButtonText: {
+  homeButtonText: {
     color: '#fff',
     fontWeight: 'bold',
     fontSize: 18,
@@ -324,13 +349,6 @@ const styles = StyleSheet.create({
   },
   backIcon: {
     marginRight: 2,
-  },
-  titleText: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    flex: 1,
-    textAlign: 'center',
-    marginRight: 60,
   },
   container: {
     flex: 1,
@@ -434,5 +452,12 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  logo: {
+    position: 'absolute',
+    top: -15,
+    left: -15,
+    width: 70,
+    height: 70,
   },
 });

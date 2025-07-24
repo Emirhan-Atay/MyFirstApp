@@ -8,7 +8,8 @@ import {
   Alert, 
   BackHandler,
   Image, 
-  FlatList
+  FlatList,
+  TextInput
 } from 'react-native';
 import api from '../api/axiosInstance';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
@@ -31,7 +32,11 @@ type Product = {
 export default function HomeScreen() {
   const navigation = useNavigation<HomeScreenNavigationProp>();
   const [products, setProducts] = useState<Product[]>([]);
+  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [searchText, setSearchText] = useState<string>('');
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [categories, setCategories] = useState<string[]>([]);
 
   const fetchProducts = async () => {
     setLoading(true);
@@ -43,7 +48,6 @@ export default function HomeScreen() {
       }
       
       const response = await api.get('/Products');
-      console.log('API Response:', response.data);
       
       const mappedProducts = response.data.map((item: any) => ({
         ProductID: item.productID,
@@ -54,12 +58,37 @@ export default function HomeScreen() {
       }));
       
       setProducts(mappedProducts);
+      setFilteredProducts(mappedProducts);
+      
+      const uniqueCategories: string[] = [...new Set(mappedProducts.map((product: Product) => product.CategoryName))].filter((category): category is string => category != null);
+      setCategories(uniqueCategories);
     } catch (error) {
       console.log('Error fetching products:', error);
     } finally {
       setLoading(false);
     }
   };
+
+  const filterProducts = useCallback(() => {
+    let filtered = products;
+
+    if (selectedCategory !== 'all') {
+      filtered = filtered.filter(product => product.CategoryName === selectedCategory);
+    }
+
+    if (searchText) {
+      filtered = filtered.filter(product => 
+        product.ProductName.toLowerCase().includes(searchText.toLowerCase()) ||
+        product.CategoryName.toLowerCase().includes(searchText.toLowerCase())
+      );
+    }
+
+    setFilteredProducts(filtered);
+  }, [products, selectedCategory, searchText]);
+
+  React.useEffect(() => {
+    filterProducts();
+  }, [filterProducts]);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -91,6 +120,11 @@ export default function HomeScreen() {
     navigation.navigate('ProductDetail', { productId });
   }
 
+  const clearSearch = () => {
+    setSearchText('');
+    setSelectedCategory('all');
+  };
+
   return (
     <ScreenWrapper>
       <TouchableOpacity style={styles.logoutButton} onPress={() => logout(navigation)}>
@@ -110,14 +144,69 @@ export default function HomeScreen() {
         </View>
       </View>
 
+      <View style={styles.searchContainer}>
+        <View style={styles.searchInputContainer}>
+          <IconComponent iconName="search" size={20} color="#666" />
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Search products or categories..."
+            value={searchText}
+            onChangeText={setSearchText}
+            placeholderTextColor="#999"
+          />
+          {searchText ? (
+            <TouchableOpacity onPress={() => setSearchText('')}>
+              <IconComponent iconName="clear" size={20} color="#666" />
+            </TouchableOpacity>
+          ) : null}
+        </View>
+      </View>
+
+      <View style={styles.filterContainer}>
+        <FlatList
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          data={[{ name: 'All', value: 'all' }, ...categories.map(cat => ({ name: cat, value: cat }))]}
+          keyExtractor={(item) => item.value}
+          renderItem={({ item }) => (
+            <TouchableOpacity
+              style={[
+                styles.filterChip,
+                selectedCategory === item.value && styles.filterChipActive
+              ]}
+              onPress={() => setSelectedCategory(item.value)}
+            >
+              <Text style={[
+                styles.filterChipText,
+                selectedCategory === item.value && styles.filterChipTextActive
+              ]}>
+                {item.name}
+              </Text>
+            </TouchableOpacity>
+          )}
+          contentContainerStyle={styles.filterList}
+        />
+        {(searchText || selectedCategory !== 'all') && (
+          <TouchableOpacity style={styles.clearButton} onPress={clearSearch}>
+            <Text style={styles.clearButtonText}>Clear</Text>
+          </TouchableOpacity>
+        )}
+      </View>
+
+      <View style={styles.resultContainer}>
+        <Text style={styles.resultText}>
+          {filteredProducts.length} product{filteredProducts.length !== 1 ? 's' : ''} found
+        </Text>
+      </View>
+
       {loading ? (
         <Text style={{ textAlign: 'center', marginTop: 50 }}>Loading...</Text>
       ) : (
         <FlatList
-          data={products}
+          data={filteredProducts}
           keyExtractor={(item) => item.ProductID.toString()}
           renderItem={({ item }) => (
-            <TouchableOpacity style={styles.productItem}onPress={() => handleProductDetail(item.ProductID)}>
+            <TouchableOpacity style={styles.productItem} onPress={() => handleProductDetail(item.ProductID)}>
               <View style={styles.productInfo}>
                 <View style={styles.productHeader}>
                   <Text style={styles.productName}>{item.ProductName}</Text>
@@ -127,20 +216,27 @@ export default function HomeScreen() {
                 </View>
                 {item.ProductPrice ? (
                   <View style={styles.iconRow}>
-                    <IconComponent iconName="emoji-emotions" size={16} color="#888" />
-                    <Text style={styles.productPrice}>{item.ProductPrice}</Text>
+                    <IconComponent iconName="attach-money" size={16} color="#4CAF50" />
+                    <Text style={styles.productPrice}>${item.ProductPrice}</Text>
                   </View>
                 ) : (
                   <View style={styles.iconRow}>
+                    <IconComponent iconName="money-off" size={16} color="#888" />
                     <Text style={styles.productPrice}>No Price</Text>
                   </View>
                 )}
               </View>
             </TouchableOpacity>
           )}
+          ListEmptyComponent={
+            <View style={styles.emptyContainer}>
+              <IconComponent iconName="search-off" size={48} color="#ccc" />
+              <Text style={styles.emptyText}>No products found</Text>
+              <Text style={styles.emptySubText}>Try adjusting your search or filters</Text>
+            </View>
+          }
         />
       )}
-
 
       <View style={styles.buttonContainer}>
         <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('CategoryList')}>
@@ -177,6 +273,95 @@ const styles = StyleSheet.create({
     width: '100%',
     paddingHorizontal: 20,
     marginBottom: 10,
+  },
+  searchContainer: {
+    paddingHorizontal: 20,
+    marginBottom: 15,
+  },
+  searchInputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#f5f5f5',
+    borderRadius: 25,
+    paddingHorizontal: 15,
+    paddingVertical: 10,
+    borderWidth: 1,
+    borderColor: '#e0e0e0',
+  },
+  searchInput: {
+    flex: 1,
+    marginLeft: 10,
+    fontSize: 16,
+    color: '#333',
+  },
+  filterContainer: {
+    paddingHorizontal: 20,
+    marginBottom: 10,
+  },
+  filterList: {
+    paddingVertical: 5,
+  },
+  filterChip: {
+    backgroundColor: '#f0f0f0',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+    marginRight: 10,
+    borderWidth: 1,
+    borderColor: '#e0e0e0',
+  },
+  filterChipActive: {
+    backgroundColor: '#007BFF',
+    borderColor: '#007BFF',
+  },
+  filterChipText: {
+    fontSize: 14,
+    color: '#666',
+    fontWeight: '500',
+  },
+  filterChipTextActive: {
+    color: '#fff',
+    fontWeight: 'bold',
+  },
+  clearButton: {
+    alignSelf: 'flex-end',
+    marginTop: 5,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    backgroundColor: '#dc3545',
+    borderRadius: 15,
+  },
+  clearButtonText: {
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: 'bold',
+  },
+  resultContainer: {
+    paddingHorizontal: 20,
+    marginBottom: 10,
+  },
+  resultText: {
+    fontSize: 14,
+    color: '#666',
+    fontStyle: 'italic',
+  },
+  emptyContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 60,
+    paddingHorizontal: 40,
+  },
+  emptyText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#999',
+    marginTop: 16,
+    marginBottom: 8,
+  },
+  emptySubText: {
+    fontSize: 14,
+    color: '#ccc',
+    textAlign: 'center',
   },
   buttonContainer: {
     alignItems: 'center',
