@@ -62,13 +62,13 @@ export default function AddCategoryScreen() {
   return (
     <ScreenWrapper>
       <View style={styles.header}>
+        <TouchableOpacity style={styles.homeButton} onPress={() => navigation.navigate('Home')}>
+          <Icon name="home" size={18} color="#dc3545" />
+        </TouchableOpacity>
+        <Text style={styles.titleText}>Add Category</Text>
         <View style={styles.logoSpace}>
           <Image source={require('../../assets/worksoft-logomark-01-1.png')} style={styles.logo} />
         </View>
-        <Text style={styles.titleText}>Add Category</Text>
-        <TouchableOpacity style={styles.homeButton} onPress={() => navigation.navigate('Home')}>
-          <Icon name="home" size={20} color="#fff" />
-        </TouchableOpacity>
       </View>
 
       <ScrollView style={styles.container}>
@@ -130,15 +130,15 @@ const styles = StyleSheet.create({
     borderBottomColor: '#e0e0e0',
   },
   logoSpace: {
-    width: 35,
+    width: 60,
     height: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   logo: {
-    position: 'absolute',
-    top: -15,
-    left: -15,
-    width: 70,
-    height: 70,
+    width: 60,
+    height: 60,
+    resizeMode: 'contain',
   },
   titleText: {
     fontSize: 24,
@@ -148,20 +148,22 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   homeButton: {
-    backgroundColor: '#dc3545',
-    width: 60,
-    height: 40,
-    borderRadius: 20,
+    width: 50,
+    height: 50,
+    borderRadius: 25,
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: '#fff',
+    borderWidth: 1,
+    borderColor: '#dc3545',
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
       height: 2,
     },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 3,
   },
   container: {
     flex: 1,

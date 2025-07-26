@@ -7,4 +7,5 @@ export type RootStackParamList = {
   ProductDetail: { productId: number };
   CategoryDetail: { categoryId: number };
   Register: undefined;
+  ProductList: undefined;
 };

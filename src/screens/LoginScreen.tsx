@@ -11,7 +11,7 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../types';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useAuth } from '../context/AuthContext';
 import api from '../api/axiosInstance';
 import ScreenWrapper from '../components/ScreenWrapper';
 
@@ -19,8 +19,9 @@ type LoginNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Login'
 
 export default function LoginScreen() {
   const navigation = useNavigation<LoginNavigationProp>();
-  const [username, setUsername] = useState('Emir');
-  const [password, setPassword] = useState('1234');
+  const { login } = useAuth();
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
   const [loading, setLoading] = useState<boolean>(false);
 
   const handleLogin = async () => {
@@ -33,26 +34,21 @@ export default function LoginScreen() {
 
     try {
       const response = await api.post('/Auth/login', {
-        username,
-        password,
+        UserName: username,
+        Password: password,
       });
 
       if (response.data.token) {
-        await AsyncStorage.setItem('token', response.data.token);
-        navigation.reset({
-          index: 0,
-          routes: [{ name: 'Home' }],
-        });
+        await login(response.data.token);
       } else {
         Alert.alert('Login Failed', 'Invalid credentials');
       }
     } catch (error: any) {
       if (error.response && (error.response.status === 400 || error.response.status === 401)) {
-        Alert.alert('Login Failed', 'Invalid credentials');
+        Alert.alert('Login Failed', error.response?.data?.errorMessage || 'Invalid credentials');
       } else {
         Alert.alert('Login Failed', 'An error occurred. Please try again.');
       }
-      console.log(error);
     } finally {
       setLoading(false);
     }
@@ -82,8 +78,14 @@ export default function LoginScreen() {
           onChangeText={setPassword}
           secureTextEntry
         />
-        <TouchableOpacity style={styles.button} onPress={handleLogin}>
-          <Text style={styles.buttonText}>Login</Text>
+        <TouchableOpacity 
+          style={[styles.button, loading && styles.buttonDisabled]} 
+          onPress={handleLogin}
+          disabled={loading}
+        >
+          <Text style={styles.buttonText}>
+            {loading ? 'Logging in...' : 'Login'}
+          </Text>
         </TouchableOpacity>
         
         <TouchableOpacity 
@@ -96,7 +98,6 @@ export default function LoginScreen() {
         </TouchableOpacity>
       </View>
     </ScreenWrapper>
-
   );
 }
 
@@ -128,6 +129,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 25,
+  },
+  buttonDisabled: {
+    backgroundColor: '#ccc',
   },
   buttonText: {
     color: '#fff',

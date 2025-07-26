@@ -39,15 +39,13 @@ export default function RegisterScreen() {
     }
 
     try {
-      
-      const response = await api.post('/Users', {
+      const response = await api.post('/Auth/register', {
         UserName: username,
         FirstName: username,
         LastName: '',
         UserPassword: password,
       });
 
-      
       if (response.status === 200 || response.status === 201) {
         Alert.alert('Success', 'Account created successfully!', [
           { text: 'OK', onPress: () => navigation.navigate('Login') }
@@ -55,14 +53,9 @@ export default function RegisterScreen() {
       }
     } catch (error: any) {
       console.log('Full error:', error);
-      console.log('Error response:', error.response); 
-      console.log('Error status:', error.response?.status);
-      console.log('Error data:', error.response?.data);
       
       if (error.response && error.response.status === 400) {
         Alert.alert('Registration Failed', error.response?.data?.message || 'Username already exists');
-      } else if (error.response && error.response.status === 401) {
-        Alert.alert('Registration Failed', 'Authorization required');
       } else {
         Alert.alert('Registration Failed', `Error: ${error.message}`);
       }
